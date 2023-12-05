@@ -1,0 +1,35 @@
+{# Child template extending the base template. This template is tailored for individual articles, providing specific structure and styling for article display. #}
+{% extends 'base.html' %} {# Extends the base template to inherit its structure and resources. #}
+{% load group_validate %} {# Loads the custom group validation tag library, if not already loaded in the base template. #}
+
+<title>{{ title }}</title>
+{# Placeholder for article-specific CSS. #}
+{% block custom_css %}
+
+
+{% endblock custom_css %}
+{% block text_alignment %}text-start{% endblock text_alignment %}
+{# Main content block for the article page. #}
+{% block content %}
+    <div class="hstack gap-3 mb-2">
+            {# Conditional buttons for editing and deleting the article, visible only to certain user groups. #}
+            {% if request.user|user_in_group:'Writers' or request.user|user_in_group:'Editors' or request.user|user_in_group:'Senior editors'%}
+                <a class="btn btn-outline-dark" href="{% url 'article_edit' article.id %}">Edit Article</a>
+            {% endif %}
+            {% if request.user|user_in_group:'Editors' or request.user|user_in_group:'Senior editors'%}
+                <div class="vr"></div>
+                <a type="button" class="btn btn-outline-danger" href="{% url 'article_delete' article.id %}">Delete Article</a>
+            {% endif %}
+    </div>
+    <div>
+        {# Article image and content display. #}
+        {% if article.image %}
+        <img src="{{ article.image.url }}" alt="">
+        {% endif %}
+        <h1>{{ article.title }}</h1>
+        <span>{{ article.source }}, {{ article.time_published }}</span>
+        <hr class="border border-danger border-2 opacity-50">
+        <p>{{ article.body }}</p>
+
+    </div>
+{% endblock content %}

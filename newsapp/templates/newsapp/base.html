@@ -1,0 +1,111 @@
+{# Main base template for the Django application. This template provides the foundational HTML structure and includes critical resources such as Bootstrap and jQuery. It is designed to be extended by other templates in the application. #}
+
+{% load static %} {# Loads the static files tag library, enabling the use of static file references in the template. #}
+{% load group_validate %} {# Custom template tag library for user group validation. #}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {# Linking Bootstrap CSS for styling #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
+    {# Dynamic title setting. If 'title' context variable is provided, it is used; otherwise, a default title is set. #}
+    {%  if title %}
+        <title>BrainWash News - {{ title }}</title>
+    {%  else %}
+        <title>BrainWash News</title>
+    {%  endif %}
+
+</head>
+
+<style>
+{# Placeholder for additional custom CSS that can be injected by child templates. #}
+{% block custom_css %}{% endblock custom_css %}
+</style>
+<body>
+    {# Bootstrap and jQuery scripts for interactivity and components. #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    {# Navigation bar setup using Bootstrap classes. Includes dynamic rendering based on user authentication and group membership. #}
+    <nav class="navbar navbar-expand-lg bg-dark border-bottom border-bottom-dark" data-bs-theme="dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="{% static 'newsapp/logo2.jpg' %}" alt="" width="40" height="40">
+            BrainWash News
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% url 'home' %}">Home</a>
+            </li>
+            {% if user.is_authenticated %}
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% url 'logout' %}">Logout</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% url 'account' %}">Account</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="{% url 'signup' %}">Signup</a>
+            </li>
+            {% endif %}
+          </ul>
+          <ul class="navbar-nav mx-auto">
+            {% if request.user|user_in_group:'Writers' or request.user|user_in_group:'Editors' or request.user|user_in_group:'Senior editors'%}
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="{% url 'create_article' %}">Create Article</a>
+                </li>
+            {% endif %}
+            {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    News
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item text-white" href="{%  url 'general_news' %}">General</a></li>
+                    <li><a class="dropdown-item text-white " href="{%  url 'economic_news' %}">Economy</a></li>
+                    <li><a class="dropdown-item text-white" href="{%  url 'health_news' %}">Health</a></li>
+                  </ul>
+                </li>
+            {% endif %}
+          </ul>
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active ms-auto p-2" aria-current="page" href="{% url 'admin:index' %}">Admin's Portal</a>
+            </li>
+        </div>
+      </div>
+    </nav>
+    {# Main content area. Child templates can override these blocks to inject specific content. #}
+    <main role="main" class="container d-flex flex-column justify-content-center align-items-center">
+        <div class="row text-start align-items-start">
+            {# Flash messages display block. #}
+            {% if messages %}
+                {# Iterates over and displays messages passed through Django's messaging framework. #}
+                <div class="mt-2 {% block flash_style %}col{% endblock flash_style %}">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+      <div class="row {% block text_alignment %}text-center{% endblock text_alignment %} p-4 mt-10">
+        <div class="{% block content_width %}col-md{% endblock content_width%}">
+          {# Content block - to be filled in by child templates. #}
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+    </main>
+</body>
+</html>

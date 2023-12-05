@@ -1,0 +1,44 @@
+{# Extends the base template to inherit common structural elements and resources. #}
+{% extends 'base.html' %}
+
+{# Sets the title of the page dynamically using the 'title' variable passed from the view. #}
+<title>{{ title }}</title>
+
+{% block custom_css %}
+    {# Custom CSS block for any additional styling specific to the home page. #}
+    a {
+        text-decoration: none;
+        color: inherit;  /* Ensures links maintain the same color as the surrounding text. */
+    }
+{% endblock custom_css %}
+
+{% block text_alignment %}text-start{% endblock text_alignment %}
+
+{% block content %}
+    {# Main content block of the home page. #}
+    <h1>{{ header }}</h1>
+    {# Horizontal rule for visual separation with a distinctive style. #}
+    <hr class="border border-danger border-3 opacity-50">
+
+    <div class="container-fluid">
+        <div class="row">
+            {# Loop through each article and display it. #}
+            {% for article in articles %}
+                <div class="col m-2 font">
+                    {# Hyperlink to view the individual article. #}
+                    <a href="{% url 'article_view' article.id %}">
+                        {# Conditional display of the article's image if it exists. #}
+                        {% if article.image %}
+                            <img src="{{ article.image.url }}" width="500" height="300" alt="">
+                        {% endif %}
+                        {# Displaying the article's title, source, time published, and a brief description. #}
+                        <h1>{{ article.title }}</h1>
+                        <span>{{ article.source }}, {{ article.time_published }}</span>
+                        <hr class="border border border-2 opacity-50">
+                        <p>{{ article.description}}</p>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

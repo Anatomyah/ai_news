@@ -1,0 +1,37 @@
+{# Extends the base template and loads static files. #}
+{% extends 'base.html' %}
+{% load static %}
+
+<title>{{ title }}</title>
+
+{% block custom_css %}
+a {
+    text-decoration: none;
+    color: inherit;  /* Ensures links have the same color as surrounding text. */
+}
+{% endblock custom_css %}
+{% block text_alignment %}text-start{% endblock text_alignment %}
+
+{% block content %}
+    {# Main content block for displaying a list of articles. #}
+    <div class="container-fluid">
+        <div class="row">
+            {# Iterates over articles and displays each one. #}
+            {% for article in articles %}
+                <div class="col m-2 font">
+                    {# Link to individual article view. #}
+                    <a href="{% url 'article_view' article.id %}">
+                        {# Article image, title, source, publication time, and a brief description. #}
+                        {% if article.image %}
+                            <img src="{{ article.image.url }}" width="500" height="300" alt="">
+                        {% endif %}
+                        <h1>{{ article.title }}</h1>
+                        <span>{{ article.source }}, {{ article.time_published }}</span>
+                        <hr class="border border border-2 opacity-50">
+                        <p>{{ article.description}}</p>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock content %}

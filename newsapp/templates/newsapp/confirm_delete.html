@@ -1,0 +1,18 @@
+{# Extends the base template. #}
+{% extends 'base.html' %}
+
+<title>{{ title }}</title>
+
+{% block custom_css %}
+    {# Placeholder for custom CSS. #}
+{% endblock custom_css %}
+
+{% block content %}
+    {# Content block for the delete confirmation form. #}
+    <form method="post">
+        {% csrf_token %}
+        <p>Are you sure you want to delete "{{ object }}"?</p>
+        {{ form }}
+        <input type="submit" value="Confirm">
+    </form>
+{% endblock content %}
